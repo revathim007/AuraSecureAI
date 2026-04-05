@@ -1,0 +1,10 @@
+django
+djangorestframework
+mssql-django
+pyodbc
+scikit-learn
+pandas
+numpy
+joblib
+python-dotenv
+django-cors-headers
