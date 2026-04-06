@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from serializers.hazard import PredictionInputSerializer, HazardRecordSerializer
-from models.hazard import HazardRecord
+from .serializers import PredictionInputSerializer, HazardRecordSerializer
+from .models import HazardRecord
 from utils.ml_utils import MLPredictor
 from django.db.models import Count, Avg, Max, Min
 from django.utils import timezone

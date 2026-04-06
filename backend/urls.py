@@ -1,6 +1,6 @@
 from django.urls import path
-from views.accounts import RegisterView, LoginView
-from views.hazard import PredictView, DashboardView
+from accounts.views import RegisterView, LoginView
+from hazard.views import PredictView, DashboardView
 
 urlpatterns = [
     # Auth APIs

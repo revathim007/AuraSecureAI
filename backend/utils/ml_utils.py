@@ -16,9 +16,8 @@ class MLPredictor:
 
     @classmethod
     def _load_artifacts(cls):
-        # Look for ml folder in the project root (one level up from backend)
-        root_dir = settings.BASE_DIR.parent
-        ml_dir = os.path.join(root_dir, 'ml')
+        # Look for ml folder inside the backend directory
+        ml_dir = os.path.join(settings.BASE_DIR, 'ml')
         model_path = os.path.join(ml_dir, 'best_model.joblib')
         scaler_path = os.path.join(ml_dir, 'scaler.joblib')
         

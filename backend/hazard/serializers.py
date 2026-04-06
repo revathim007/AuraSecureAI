@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models.hazard import HazardRecord
+from .models import HazardRecord
 
 class PredictionInputSerializer(serializers.Serializer):
     gas_level = serializers.FloatField(min_value=0, max_value=1000)
