@@ -14,19 +14,18 @@ class MLModule:
         self.model = None
         self.data_path = data_path
 
-    def generate_synthetic_data(self, n_samples=1000):
+    def generate_synthetic_data(self, n_samples=4000):
         np.random.seed(42)
-        gas_level = np.random.uniform(0, 100, n_samples)
-        temperature = np.random.uniform(20, 80, n_samples)
+        gas_level = np.random.uniform(0, 1000, n_samples)
+        temperature = np.random.uniform(-50, 150, n_samples)
         smoke_level = np.random.uniform(0, 100, n_samples)
         
-        # Base logic for label (with some noise)
-        # Hazard if gas_level > 70 or temperature > 60 or smoke_level > 60
-        risk_score = (gas_level * 0.4 + temperature * 0.3 + smoke_level * 0.3)
-        noise = np.random.normal(0, 5, n_samples)
+        # Base logic for label (with some noise) matching the updated ranges
+        risk_score = (gas_level / 1000 * 0.4 + (temperature + 50) / 200 * 0.3 + smoke_level / 100 * 0.3)
+        noise = np.random.normal(0, 0.05, n_samples)
         risk_score += noise
         
-        label = (risk_score > 60).astype(int)
+        label = (risk_score > 0.5).astype(int)
         
         df = pd.DataFrame({
             'gas_level': gas_level,
@@ -34,15 +33,22 @@ class MLModule:
             'smoke_level': smoke_level,
             'label': label
         })
+        
+        # Save to CSV
+        ml_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(ml_dir, 'safety_monitoring.csv')
+        df.to_csv(csv_path, index=False)
+        print(f"Generated {n_samples} rows and saved to {csv_path}")
+        
         return df
 
     def feature_engineering(self, df):
         df = df.copy()
         # Avoid division by zero
-        df['gas_temp_ratio'] = df['gas_level'] / (df['temperature'] + 1)
+        df['gas_temp_ratio'] = df['gas_level'] / (df['temperature'] + 51) # Adjust for negative range
         df['smoke_gas_ratio'] = df['smoke_level'] / (df['gas_level'] + 1)
         df['temp_smoke_interaction'] = df['temperature'] * df['smoke_level']
-        df['combined_risk_score'] = (df['gas_level'] + df['temperature'] + df['smoke_level']) / 3
+        df['combined_risk_score'] = (df['gas_level'] / 10 + (df['temperature'] + 50) + df['smoke_level']) / 3
         return df
 
     def train(self):

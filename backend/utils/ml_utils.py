@@ -31,10 +31,11 @@ class MLPredictor:
     def feature_engineering(self, data):
         # input data should be a dict with gas_level, temperature, smoke_level
         df = pd.DataFrame([data])
-        df['gas_temp_ratio'] = df['gas_level'] / (df['temperature'] + 1)
+        # Match training logic exactly
+        df['gas_temp_ratio'] = df['gas_level'] / (df['temperature'] + 51)
         df['smoke_gas_ratio'] = df['smoke_level'] / (df['gas_level'] + 1)
         df['temp_smoke_interaction'] = df['temperature'] * df['smoke_level']
-        df['combined_risk_score'] = (df['gas_level'] + df['temperature'] + df['smoke_level']) / 3
+        df['combined_risk_score'] = (df['gas_level'] / 10 + (df['temperature'] + 50) + df['smoke_level']) / 3
         return df
 
     def predict(self, input_data):
