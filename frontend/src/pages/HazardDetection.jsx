@@ -160,12 +160,15 @@ const HazardDetection = () => {
                   {result.prediction === 'Alarm' ? <ShieldAlert size={64} /> : <ShieldCheck size={64} />}
                 </div>
                 
-                <div className="space-y-2">
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-[0.2em]">System Status</p>
-                  <h3 className={`text-5xl font-black ${result.prediction === 'Alarm' ? 'text-red-500' : 'text-green-500'}`}>
-                    {result.prediction}
-                  </h3>
-                </div>
+                <h2 className={`text-5xl font-black mb-4 ${result.prediction === 'Alarm' ? 'text-red-600' : 'text-green-600'}`}>
+                  {result.prediction}
+                </h2>
+                
+                {result.prediction === 'Alarm' && result.reason && (
+                  <p className="text-red-500 font-bold text-sm mb-6 px-4 py-2 bg-red-50 rounded-xl border border-red-100 max-w-[280px] mx-auto">
+                    {result.reason}
+                  </p>
+                )}
 
                 <div className="max-w-[200px] mx-auto p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Confidence Score</p>
@@ -219,8 +222,15 @@ const HazardDetection = () => {
               <div className="space-y-2">
                 <h3 className="text-3xl font-black text-gray-900">Critical Hazard!</h3>
                 <p className="text-gray-500 font-medium leading-relaxed">
-                  Our AI system has detected a potential danger based on the current sensor readings.
+                  Our AI system has detected a potential danger:
                 </p>
+                {result?.reason && (
+                  <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-2xl">
+                    <p className="text-red-600 font-bold text-sm">
+                      {result.reason}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="w-full space-y-3 pt-2">

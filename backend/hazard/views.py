@@ -20,7 +20,11 @@ class PredictView(APIView):
                 
                 # Use MLPredictor
                 predictor = MLPredictor()
-                prediction, confidence, engineered_features = predictor.predict(input_data)
+                prediction, confidence, result_info = predictor.predict(input_data)
+                
+                # Check for ML-specific errors (e.g. validation or model missing)
+                if prediction is None:
+                    return Response({'error': result_info.get('error', 'Prediction failed')}, status=status.HTTP_400_BAD_REQUEST)
                 
                 # Save to database (matching SQL Server schema)
                 hazard_record = HazardRecord.objects.create(
@@ -36,6 +40,7 @@ class PredictView(APIView):
                     'message': 'Prediction successful',
                     'prediction': 'Alarm' if prediction == 1 else 'Safe',
                     'confidence_score': round(confidence * 100, 2),
+                    'reason': result_info.get('reason', ''),
                     'record_id': hazard_record.id
                 }, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -60,6 +65,17 @@ class DashboardView(APIView):
             last_24h = timezone.now() - timedelta(hours=24)
             recent_alarms = user_records.filter(created_at__gte=last_24h, prediction=1).count()
             
+            # Last 10 records for the graph
+            recent_history = user_records.order_by('-created_at')[:10]
+            history_data = [
+                {
+                    'time': rec.created_at.strftime('%H:%M'),
+                    'gas': float(rec.gas_level),
+                    'temp': float(rec.temperature),
+                    'smoke': float(rec.smoke_level)
+                } for rec in reversed(recent_history)
+            ]
+            
             return Response({
                 'summary': {
                     'total_scans': total_scans,
@@ -71,7 +87,8 @@ class DashboardView(APIView):
                     'avg_gas': round(avg_gas, 2),
                     'avg_temp': round(avg_temp, 2),
                     'avg_smoke': round(avg_smoke, 2)
-                }
+                },
+                'history': history_data
             }, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

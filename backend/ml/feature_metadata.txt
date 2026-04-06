@@ -1,0 +1,10 @@
+gas_level
+temperature
+pressure
+smoke_level
+gas_temp_inter
+smoke_temp_inter
+gas_smoke_inter
+gas_temp_ratio
+smoke_gas_ratio
+total_risk_index

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, ShieldAlert, ShieldCheck, Activity, Zap } from 'lucide-react';
+import { LayoutDashboard, ShieldAlert, ShieldCheck, Activity, Zap, TrendingUp } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import Card from '../components/Card';
 import Loader from '../components/Loader';
 import { hazardService } from '../services/api';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -80,7 +81,65 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="max-w-2xl mx-auto w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Trend Graph */}
+        <div className="lg:col-span-2">
+          <Card title="Sensor Trends" subtitle="Real-time monitoring history" className="shadow-premium border-none h-full">
+            <div className="h-[300px] w-full pt-4">
+              {data?.history && data.history.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={data.history}>
+                    <defs>
+                      <linearGradient id="colorGas" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis 
+                      dataKey="time" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{fill: '#9ca3af', fontSize: 12, fontWeight: 600}}
+                      dy={10}
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{fill: '#9ca3af', fontSize: 12, fontWeight: 600}}
+                    />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="gas" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3}
+                      fillOpacity={1} 
+                      fill="url(#colorGas)" 
+                      name="Gas Level"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="temp" 
+                      stroke="#f97316" 
+                      strokeWidth={3}
+                      fill="none"
+                      name="Temperature"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-2">
+                  <TrendingUp size={48} className="opacity-20" />
+                  <p className="font-medium">No history data yet</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+
         {/* Environmental Averages */}
         <Card title="Averages" subtitle="Baseline sensor levels" className="shadow-premium border-none">
           <div className="space-y-8 py-4">
