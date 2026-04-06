@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Shield, LayoutDashboard, History, Zap, LogOut } from 'lucide-react';
+import { Shield, LayoutDashboard, History, Zap, LogOut, Siren, TrendingUp } from 'lucide-react';
 import { authService } from '../services/api';
 
 const Navbar = () => {
@@ -16,6 +16,8 @@ const Navbar = () => {
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Detection', path: '/hazard-detection', icon: Zap },
+    { label: 'Emergency', path: '/emergency-contacts', icon: Siren },
+    { label: 'Forecasting', path: '/forecasting', icon: TrendingUp },
   ];
 
   return (

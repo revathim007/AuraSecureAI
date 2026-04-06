@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Zap, ShieldAlert, ShieldCheck, Activity } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Zap, ShieldAlert, ShieldCheck, Activity, Bell, X, AlertTriangle, TrendingUp } from 'lucide-react';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import ResultBadge from '../components/ResultBadge';
 import { hazardService } from '../services/api';
 
 const HazardDetection = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     gas_level: '',
     temperature: '',
@@ -16,6 +17,7 @@ const HazardDetection = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [serverError, setServerError] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -74,6 +76,9 @@ const HazardDetection = () => {
       };
       const response = await hazardService.predict(payload);
       setResult(response.data);
+      if (response.data.prediction === 'Alarm') {
+        setShowModal(true);
+      }
     } catch (err) {
       setServerError(err.response?.data?.error || 'Failed to get prediction. Please try again.');
     } finally {
@@ -164,7 +169,18 @@ const HazardDetection = () => {
 
                 <div className="max-w-[200px] mx-auto p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Confidence Score</p>
-                  <p className="text-2xl font-extrabold text-gray-700">{(result.confidence_score * 100).toFixed(1)}%</p>
+                  <p className="text-2xl font-extrabold text-gray-700">{result.confidence_score.toFixed(1)}%</p>
+                </div>
+
+                <div className="pt-4">
+                  <Button 
+                    variant="outline" 
+                    fullWidth
+                    onClick={() => navigate('/forecasting', { state: { inputData: formData } })}
+                    className="py-3 border-2"
+                  >
+                    <TrendingUp size={18} /> View Future Forecast
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -180,6 +196,56 @@ const HazardDetection = () => {
           </Card>
         </div>
       </div>
+
+      {/* Alert Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl border border-red-100 animate-in zoom-in-95 duration-300 relative overflow-hidden">
+            {/* Background pattern */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full -mr-16 -mt-16 opacity-50" />
+            
+            <button 
+              onClick={() => setShowModal(false)}
+              className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="relative flex flex-col items-center text-center space-y-6">
+              <div className="w-20 h-20 bg-red-500 rounded-[2rem] flex items-center justify-center shadow-lg shadow-red-200 animate-bounce-slow">
+                <AlertTriangle size={40} className="text-white" />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-3xl font-black text-gray-900">Critical Hazard!</h3>
+                <p className="text-gray-500 font-medium leading-relaxed">
+                  Our AI system has detected a potential danger based on the current sensor readings.
+                </p>
+              </div>
+
+              <div className="w-full space-y-3 pt-2">
+                <Button 
+                  variant="danger" 
+                  fullWidth 
+                  className="py-4 text-lg shadow-lg shadow-red-100"
+                  onClick={() => {
+                    setShowModal(false);
+                    navigate('/emergency-contacts');
+                  }}
+                >
+                  <Bell size={20} /> Send Alerts Now
+                </Button>
+                <button 
+                  onClick={() => setShowModal(false)}
+                  className="w-full py-4 text-gray-400 font-bold hover:text-gray-600 transition-colors"
+                >
+                  Dismiss for now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

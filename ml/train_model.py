@@ -16,20 +16,27 @@ class MLModule:
 
     def generate_synthetic_data(self, n_samples=4000):
         np.random.seed(42)
-        gas_level = np.random.uniform(0, 1000, n_samples)
-        temperature = np.random.uniform(-50, 150, n_samples)
-        smoke_level = np.random.uniform(0, 100, n_samples)
         
-        # Base logic for label (with some noise) matching the updated ranges
-        risk_score = (gas_level / 1000 * 0.4 + (temperature + 50) / 200 * 0.3 + smoke_level / 100 * 0.3)
-        noise = np.random.normal(0, 0.05, n_samples)
-        risk_score += noise
+        # New data distribution logic as requested
+        timestamp = pd.date_range(start="2026-01-01", periods=n_samples, freq="min")
+        gas_level = np.random.normal(100, 50, n_samples)
+        temperature = np.random.normal(60, 15, n_samples)
+        pressure = np.random.normal(200, 40, n_samples)
+        smoke_level = np.random.normal(5, 3, n_samples)
         
-        label = (risk_score > 0.5).astype(int)
+        # Rule-based labeling with noise:
+        # Alarm (1) if Gas > 250 OR Smoke > 15 OR Temperature > 90
+        label = ((gas_level > 250) | (smoke_level > 15) | (temperature > 90)).astype(int)
+        
+        # Adding a lot of noise - flipping labels
+        noise_mask = np.random.choice([True, False], size=n_samples, p=[0.15, 0.85]) # Increased noise to 15%
+        label[noise_mask] = 1 - label[noise_mask]
         
         df = pd.DataFrame({
+            'timestamp': timestamp,
             'gas_level': gas_level,
             'temperature': temperature,
+            'pressure': pressure,
             'smoke_level': smoke_level,
             'label': label
         })
@@ -38,17 +45,22 @@ class MLModule:
         ml_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(ml_dir, 'safety_monitoring.csv')
         df.to_csv(csv_path, index=False)
-        print(f"Generated {n_samples} rows and saved to {csv_path}")
+        print(f"Generated {n_samples} rows with timestamp and pressure, saved to {csv_path}")
         
         return df
 
     def feature_engineering(self, df):
         df = df.copy()
-        # Avoid division by zero
-        df['gas_temp_ratio'] = df['gas_level'] / (df['temperature'] + 51) # Adjust for negative range
+        # Ensure we don't use timestamp for training directly
+        if 'timestamp' in df.columns:
+            df = df.drop('timestamp', axis=1)
+            
+        # Feature engineering logic (keeping it consistent with original but adding pressure)
+        df['gas_temp_ratio'] = df['gas_level'] / (df['temperature'] + 51)
         df['smoke_gas_ratio'] = df['smoke_level'] / (df['gas_level'] + 1)
         df['temp_smoke_interaction'] = df['temperature'] * df['smoke_level']
         df['combined_risk_score'] = (df['gas_level'] / 10 + (df['temperature'] + 50) + df['smoke_level']) / 3
+        df['pressure_temp_ratio'] = df['pressure'] / (df['temperature'] + 51)
         return df
 
     def train(self):
@@ -56,6 +68,7 @@ class MLModule:
         df = self.feature_engineering(df)
         
         X = df.drop('label', axis=1)
+        print("Training with features:", X.columns.tolist())
         y = df['label']
         
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)

@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import HazardDetection from './pages/HazardDetection';
+import EmergencyContacts from './pages/EmergencyContacts';
+import Forecasting from './pages/Forecasting';
 import Home from './pages/Home';
 
 const router = createBrowserRouter([
@@ -27,6 +29,8 @@ const router = createBrowserRouter([
     children: [
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'hazard-detection', element: <HazardDetection /> },
+      { path: 'emergency-contacts', element: <EmergencyContacts /> },
+      { path: 'forecasting', element: <Forecasting /> },
     ],
   },
   {
