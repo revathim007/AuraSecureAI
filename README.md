@@ -4,16 +4,16 @@
 
 AuraSecureAI is a **full-stack, production-ready safety monitoring system** that uses **Machine Learning** to detect hazardous environmental conditions in real time.
 
-It combines a **modern React frontend**, a **scalable Django backend**, and a **SQL Server database**, with **data-driven ML models** to ensure accurate and reliable safety predictions.
+It combines a **modern React frontend**, a **scalable Django backend**, and a **SQL Server database**,**deployed on azure**, with **data-driven ML models** to ensure accurate and reliable safety predictions.
 
 ---
 
 ## 🚀 Key Highlights
 
 ✔️ Real-time hazard prediction using ML
-✔️ Clean full-stack architecture (React + Django + SQL Server)
+✔️ Clean full-stack architecture (React + Django + SQL Server, deployed on Azure)
 ✔️ Strong validation & error handling (frontend + backend)
-✔️ No rule-based logic — fully ML-driven predictions
+✔️ fully ML-driven predictions
 ✔️ Secure authentication system
 ✔️ Historical tracking & analytics dashboard
 
@@ -97,7 +97,7 @@ It combines a **modern React frontend**, a **scalable Django backend**, and a **
 
 ### ❌ Important Note
 
-> No hardcoded rules are used — prediction is purely based on ML learning patterns.
+prediction is purely based on ML learning patterns.
 
 ---
 
@@ -177,11 +177,6 @@ python ml/train_model.py
 
 ---
 
-## 🧪 Testing & Verification
-
-✔️ API tested using DRF & frontend integration
-✔️ ML evaluated using classification metrics
-✔️ Database verified using SQL Server (SSMS)
 
 ---
 
