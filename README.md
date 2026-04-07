@@ -1,5 +1,6 @@
 # 🛡️ AuraSecureAI 🤖
-
+**Link of the Deployed Project** - https://aurasecureai.duckdns.org
+User Can **Register** and **Login** to Check Hazard Detection
 ### Intelligent ML-Powered Hazard Detection & Safety Monitoring System
 
 AuraSecureAI is a **full-stack, production-ready safety monitoring system** that uses **Machine Learning** to detect hazardous environmental conditions in real time.
